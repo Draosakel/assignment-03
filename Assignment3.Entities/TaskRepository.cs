@@ -7,12 +7,16 @@ public class TaskRepository : ITaskRepository
 {
     private readonly List<Task> _task = new List<Task>();
     public IReadOnlyCollection<Task> Tasks => _task;
+    KanbanContext _context;
+    public TaskRepository(KanbanContext _context){
+        this._context = _context;
+    }
 
 
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {
         var t = new Task() { Title = task.Title, Id = task.AssignedToId, Description = task.Description, Tags = (ICollection<Tag>)task.Tags, State = State.New };
-
+        _context.Tasks.Add(t);
         return (Response.Created, (int)t.Id);
     }
 
