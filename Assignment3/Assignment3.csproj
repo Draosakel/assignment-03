@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,20 +6,17 @@
     <Nullable>enable</Nullable>
     <UserSecretsId>9264cf75-9c9f-40f1-827b-8f231b4776d4</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.9"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1"/>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.0"/>
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Assignment3.Core\Assignment3.Core.csproj" />
-    <ProjectReference Include="..\Assignment3.Entities\Assignment3.Entities.csproj" />
+    <ProjectReference Include="..\Assignment3.Core\Assignment3.Core.csproj"/>
+    <ProjectReference Include="..\Assignment3.Entities\Assignment3.Entities.csproj"/>
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Assignment3.Core\Assignment3.Core.csproj" />
+    <ProjectReference Include="..\Assignment3.Core\Assignment3.Core.csproj"/>
   </ItemGroup>
-
 </Project>
