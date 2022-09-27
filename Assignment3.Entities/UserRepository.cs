@@ -17,9 +17,6 @@ public class UserRepository : IUserRepository
             Email = user.Email
         };
 
-        var uniqueEmail = EmailIsUnique(user.Email, _users);
-        if (!uniqueEmail.Item1) return (Response.Conflict, uniqueEmail.Item2);
-
         //Id serialization
         int id = 1;
         id = _users.OrderByDescending(a => a.Id).Select(a => a.Id).First() + 1;
@@ -67,28 +64,9 @@ public class UserRepository : IUserRepository
         var u = _users.Where(a => a.Id == user.Id).First();
         if (u == null) return Response.NotFound;
 
-        var uniqueEmail = EmailIsUnique(user.Email, _users);
-        if (!uniqueEmail.Item1) return (Response.Conflict);
-
         u.Name = user.Name;
         u.Email = user.Email;
 
         return Response.Updated;
-    }
-
-    private (bool, int) EmailIsUnique(string email, IEnumerable<User> users)
-    {
-        var isUnique = true;
-        var takenId = -1;
-        foreach (var user in users)
-        {
-            if (user.Email == email)
-            {
-                isUnique = false;
-                takenId = user.Id;
-                break;
-            }
-        }
-        return (isUnique, takenId);
     }
 }
