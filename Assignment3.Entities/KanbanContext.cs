@@ -15,8 +15,6 @@ public class KanbanContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Task>()
-                .HasMany<Tag>(t => t.Tags)
-                .WithMany(c => c.Tasks);
+        
     }
 }

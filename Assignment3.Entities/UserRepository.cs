@@ -33,14 +33,21 @@ public class UserRepository : IUserRepository
 
     public Response Delete(int userId, bool force = false)
     {
-        bool exists = _users.Where(a => a.Id == userId).ToList().Count > 0;
-        if (exists) _users.Remove(_users.Where(a => a.Id == userId).First());
+        var u = _users.FirstOrDefault(a => a.Id == userId);
+        bool exists = u != null;
+        bool canBeDeleted = true;
+        if (u.Tasks.Count > 0 && force == false) canBeDeleted = false;
+        if (exists)
+        {
+            if (canBeDeleted) _users.Remove(_users.Where(a => a.Id == userId).First());
+            else return Response.Conflict;
+        }
         return (exists ? Response.Deleted : Response.NotFound);
     }
 
     public UserDTO Read(int userId)
     {
-        var user = _users.Where(a => a.Id == userId).FirstOrDefault();
+        var user = _users.FirstOrDefault(a => a.Id == userId);
         if (user == null) return null!;
         return new UserDTO(user.Id, user.Name, user.Email);
     }
@@ -63,12 +70,8 @@ public class UserRepository : IUserRepository
         var uniqueEmail = EmailIsUnique(user.Email, _users);
         if (!uniqueEmail.Item1) return (Response.Conflict);
 
-        u = new User()
-        {
-            Id = user.Id,
-            Name = user.Name,
-            Email = user.Email
-        };
+        u.Name = user.Name;
+        u.Email = user.Email;
 
         return Response.Updated;
     }
