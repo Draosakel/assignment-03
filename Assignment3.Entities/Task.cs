@@ -1,41 +1,33 @@
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace Assignment3.Entities;
 
 public class Task
 {
-    public DbSet<Tag> Tags { get; set; }
     public int Id { get; set; }
-    public string Title
-    {
-        get
-        {
-            return Title;
-        }
-        set
-        {
-            if (value.Length > 100)
-            {
-                Title = "noTitle";
-            }
-            else Title = value;
 
-        }
-    }
-    public User AssignedTo { get; set; }
-    public string Description { get; set; }
-    public enum State
-    {
-        New,
-        Active,
-        Resolved,
-        Closed,
-        Removed
-    }
-    public Task(string title, State state)
-    {
-        this.Title = title;
-    }
+    [Required, StringLength(100)]
+    public string Title { get; set; }
 
+    public User? AssignedTo { get; set; }
+
+    public string? Description { get; set; }
+
+    [Required]
+    public State State { get; set; }
+    public virtual ICollection<Tag> Tags { get; set; }
+
+}
+
+public enum State
+{
+    New,
+    Active,
+    Resolved,
+    Closed,
+    Removed
 }
 
