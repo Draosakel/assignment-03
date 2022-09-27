@@ -15,7 +15,7 @@ public class TaskRepository : ITaskRepository
 
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {
-        var t = new Task() { Title = task.Title, Id = task.AssignedToId, Description = task.Description, Tags = (ICollection<Tag>)task.Tags, State = State.New };
+        var t = new Task() { Title = task.Title, Id = task.AssignedToId, Description = task.Description, Tags = (ICollection<string>)task.Tags, State = State.New };
         _context.Tasks.Add(t);
         return (Response.Created, (int)t.Id);
     }
@@ -113,7 +113,7 @@ public class TaskRepository : ITaskRepository
 
         t.Title = task.Title;
         t.Description = task.Description;
-        t.Tags = (ICollection<Tag>)task.Tags;
+        t.Tags = (ICollection<string>)task.Tags;
         t.AssignedToId = task.AssignedToId;
         t.State = task.State;
 

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using Assignment3.Core;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Assignment3.Entities;
 
@@ -18,7 +19,8 @@ public class Task
 
     [Required]
     public State State { get; set; }
-    public virtual ICollection<Tag>? Tags { get; set; }
+    [NotMapped]
+    public virtual ICollection<string>? Tags { get; set; }
 
 }
 

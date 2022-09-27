@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Assignment3.Entities;
 
 public class User
@@ -12,6 +12,6 @@ public class User
 
     [Required, StringLength(100)]
     public string Email { get; set; }
-
+    [NotMapped]
     public List<Task> Tasks { get; set; }
 }

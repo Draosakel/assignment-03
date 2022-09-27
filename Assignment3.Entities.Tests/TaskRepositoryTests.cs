@@ -12,24 +12,31 @@ public sealed class TaskRepositoryTests : IDisposable
     private readonly TaskRepository _repository;
 
     public TaskRepositoryTests() {
-        var connection = new SqliteConnection("Filename=:memory");
+        var connection = new SqliteConnection("Filename=:memory:");
         connection.Open();
         var builder = new DbContextOptionsBuilder<KanbanContext>();
         builder.UseSqlite(connection);
         var context = new KanbanContext(builder.Options);
         context.Database.EnsureCreated();
-        //context.Cities.AddRange(new City("Metropolis") { Id = 1 }, new City("Gotham City") { Id = 2 });
-        context.Tasks.Add(new Task { AssignedToId = 1, Title = "Task", Tags = new List<Tag>(), State = State.New });
+        context.Tasks.AddRange(new Task{Title = "Task1", Id = 1 }, new Task{Title = "Task2", Id = 2 });
+        context.Tags.Add(new Tag{Name = "Tag1", Id = 1});
         context.SaveChanges();
 
         _context = context;
         _repository = new TaskRepository(_context);
     }
-    //var connection = new SqliteConnection("Filename=:memory:")
+
     [Fact]
-    public void CreateTaskTest(){
-        var (response, created) = _repository.Create(new TaskCreateDTO(Title: "TaskTitle", AssignedToId: 2, Description: "TagTest", Tags: new List<String>()));
+    public void Create_given_Task_returns_Created_with_Task(){
+        var (response, created) = _repository.Create(new TaskCreateDTO(Title: "TaskTitle", AssignedToId: 3, Description: "TagTest", Tags: new List<string>()));
         response.Should().Be(Response.Created);
+        created.Should().Be(3);
+    }
+
+    [Fact]
+    public void Delete_given_TaskId_returns_Deleted(){
+        var response = _repository.Delete(2);
+        response.Should().Be(Response.Deleted);
     }
 
     public void Dispose() {
