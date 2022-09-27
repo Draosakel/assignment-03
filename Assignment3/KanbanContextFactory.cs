@@ -19,7 +19,7 @@ namespace Assignment3
             var connectionString = configuration.GetConnectionString("Kanban");
 
             var optionsBuilder = new DbContextOptionsBuilder<KanbanContext>();
-            optionsBuilder.UseSqlServer(connectionString);
+            optionsBuilder.UseSqlServer("Server=localhost;Database=silly_chatelet;User Id=sa;Password=<YourStrong@Passw0rd>;Trusted_Connection=False;Encrypt=False");
 
             return new KanbanContext(optionsBuilder.Options);
         }

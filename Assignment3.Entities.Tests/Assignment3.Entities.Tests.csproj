@@ -20,6 +20,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.9"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Assignment3.Entities\Assignment3.Entities.csproj"/>
