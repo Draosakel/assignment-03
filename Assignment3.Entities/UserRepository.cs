@@ -8,7 +8,10 @@ public class UserRepository : IUserRepository
 {
     private readonly List<User> _users = new List<User>();
     public IReadOnlyCollection<User> Users => _users;
-
+    KanbanContext _context;
+    public UserRepository(KanbanContext _context){
+        this._context = _context;
+    }
     public (Response Response, int UserId) Create(UserCreateDTO user)
     {
         User u = new()
