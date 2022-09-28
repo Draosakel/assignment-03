@@ -18,7 +18,7 @@ public sealed class TaskRepositoryTests : IDisposable
         builder.UseSqlite(connection);
         var context = new KanbanContext(builder.Options);
         context.Database.EnsureCreated();
-        context.Tasks.AddRange(new Task{Title = "Task1", Id = 1, State = State.New }, new Task{Title = "Task2", Id = 2, State = State.New });
+        context.Tasks.AddRange(new Task{Title = "Task1", Id = 1, State = State.New }, new Task{Title = "Task2", Id = 2, State = State.New }, new Task{Title = "Task3", Id = 3, State = State.Removed});
         context.Tags.Add(new Tag{Name = "Tag1", Id = 1});
         context.SaveChanges();
 
@@ -28,9 +28,9 @@ public sealed class TaskRepositoryTests : IDisposable
 
     [Fact]
     public void Create_given_Task_returns_Created_with_Task(){
-        var (response, created) = _repository.Create(new TaskCreateDTO(Title: "TaskTitle", AssignedToId: 3, Description: "TagTest", Tags: new List<string>()));
+        var (response, created) = _repository.Create(new TaskCreateDTO(Title: "TaskTitle", AssignedToId: 4, Description: "TagTest", Tags: new List<string>()));
         response.Should().Be(Response.Created);
-        created.Should().Be(3);
+        created.Should().Be(4);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class TaskRepositoryTests : IDisposable
     public void ReadAll_Returns_IReadOnlyCollection()
     {
         var response = _repository.ReadAll();
-        response.Should().BeEquivalentTo(new List<TaskDTO>(){new TaskDTO(1, "Task1", null, null, State.New), new TaskDTO(2, "Task2", null, null, State.New)});
+        response.Should().BeEquivalentTo(new List<TaskDTO>(){new TaskDTO(1, "Task1", null, null, State.New), new TaskDTO(2, "Task2", null, null, State.New), new TaskDTO(3, "Task3", null, null, State.Removed)});
     }
 
     [Fact]
@@ -58,6 +58,29 @@ public sealed class TaskRepositoryTests : IDisposable
     {
         var response = _repository.ReadAllByState(State.New);
         response.Should().BeEquivalentTo(new List<TaskDTO>(){new TaskDTO(1, "Task1", null, null, State.New), new TaskDTO(2, "Task2", null, null, State.New)});
+    }
+
+    [Fact]
+    public void ReadAllRemoved_Returns_IReadOnlyCollection_State_Removed()
+    {
+        var response = _repository.ReadAllRemoved();
+        response.Should().BeEquivalentTo(new List<TaskDTO>(){ new TaskDTO(3, "Task3", null, null, State.Removed)});
+    }
+
+    [Fact]
+    public void Update_given_TaskUpdateDTO_Returns_State_Updated()
+    {
+        var updateTaskDTO = new TaskUpdateDTO(2, "UpdatedTask2", null, null, new List<string>(), State.Active);
+        var response = _repository.Update(updateTaskDTO);
+        response.Should().Be(Response.Updated);
+    }
+
+     [Fact]
+    public void Update_given_NOT_Existing_TaskUpdateDTO_Returns_State_Updated()
+    {
+        var updateTaskDTO = new TaskUpdateDTO(5, "UpdatedTask2", null, null, new List<string>(), State.Active);
+        var response = _repository.Update(updateTaskDTO);
+        response.Should().Be(Response.NotFound);
     }
 
     public void Dispose() {
