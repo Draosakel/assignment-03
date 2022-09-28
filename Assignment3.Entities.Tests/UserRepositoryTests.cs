@@ -26,9 +26,6 @@ public sealed class UserRepositoryTests : IDisposable
         _repository = new UserRepository(_context);
     }
 
-    [Fact]
-    public void 
-
     public void Dispose() {
         _context.Dispose();
     }

@@ -39,6 +39,27 @@ public sealed class TaskRepositoryTests : IDisposable
         response.Should().Be(Response.Deleted);
     }
 
+    [Fact]
+    public void Read_given_TaskId_Returns_TaskDetailsDTO()
+    {
+        TaskDetailsDTO response = _repository.Read(1);
+        response.Should().Be(new TaskDetailsDTO(1, "Task1", null, DateTime.Now.Date, null, null, State.New, DateTime.MinValue));
+    }
+
+    [Fact]
+    public void ReadAll_Returns_IReadOnlyCollection()
+    {
+        var response = _repository.ReadAll();
+        response.Should().BeEquivalentTo(new List<TaskDTO>(){new TaskDTO(1, "Task1", null, null, State.New), new TaskDTO(2, "Task2", null, null, State.New)});
+    }
+
+    [Fact]
+    public void ReadAllByState_given_State_New_Returns_IReadOnlyCollection()
+    {
+        var response = _repository.ReadAllByState(State.New);
+        response.Should().BeEquivalentTo(new List<TaskDTO>(){new TaskDTO(1, "Task1", null, null, State.New), new TaskDTO(2, "Task2", null, null, State.New)});
+    }
+
     public void Dispose() {
         _context.Dispose();
     }

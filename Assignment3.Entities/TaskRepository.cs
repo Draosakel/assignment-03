@@ -50,7 +50,7 @@ public class TaskRepository : ITaskRepository
         if (t == null) return null;
 
         var tags = (IReadOnlyCollection<string>)t.Tags;
-        var task = new TaskDetailsDTO((int)t.Id, t.Title, t.Description, DateTime.Now, t.AssignedTo?.Name, tags, t.State, DateTime.MinValue);
+        var task = new TaskDetailsDTO((int)t.Id, t.Title, t.Description, DateTime.Now.Date, t.AssignedTo?.Name, tags, t.State, DateTime.MinValue);
         return task;
     }
 
