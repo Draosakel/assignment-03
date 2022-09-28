@@ -5,8 +5,6 @@ namespace Assignment3.Entities;
 
 public class TaskRepository : ITaskRepository
 {
-    private readonly List<Task> _task = new List<Task>();
-    //public IReadOnlyCollection<Task> Tasks => _task;
     KanbanContext _context;
     public TaskRepository(KanbanContext _context){
         this._context = _context;
@@ -37,7 +35,7 @@ public class TaskRepository : ITaskRepository
                 t.State = State.Removed;
                 return Response.Deleted;
             case State.New:
-                _task.Remove(t);
+                _context.Tasks.Remove(t);
                 return Response.Deleted;
             default:
                 return Response.BadRequest;
@@ -47,11 +45,13 @@ public class TaskRepository : ITaskRepository
 
     public TaskDetailsDTO Read(int taskId)
     {
-        var t = _context.Tasks.FirstOrDefault(a => a.Id == taskId);
+        var t = _context.Tasks.Where(a => a.Id == taskId).FirstOrDefault();
 
         if (t == null) return null;
 
-        return new TaskDetailsDTO((int)t.Id, t.Title, t.Description, DateTime.Now, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State, DateTime.MinValue);
+        var tags = (IReadOnlyCollection<string>)t.Tags;
+        var task = new TaskDetailsDTO((int)t.Id, t.Title, t.Description, DateTime.Now, t.AssignedTo?.Name, tags, t.State, DateTime.MinValue);
+        return task;
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAll()
@@ -59,49 +59,32 @@ public class TaskRepository : ITaskRepository
         var tempList = new List<TaskDTO>();
         foreach (Task t in _context.Tasks)
         {
-            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
+            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo?.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
         }
         return tempList.Count > 0 ? tempList : null;
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllByState(State state)
     {
-        var tempList = new List<TaskDTO>();
-        foreach (Task t in _context.Tasks.Where(a => a.State == state))
-        {
-            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
-        }
-        return tempList.Count > 0 ? tempList : null;
+        return (IReadOnlyCollection<TaskDTO>)ReadAll()?.Where(a => a.State == state);
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag)
     {
-        var tempList = new List<TaskDTO>();
-        foreach (Task t in _context.Tasks.Where(a => ((IReadOnlyCollection<string>)a.Tags).Contains(tag)))
-        {
-            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
-        }
-        return tempList.Count > 0 ? tempList : null;
+        return (IReadOnlyCollection<TaskDTO>)ReadAll()?.Where(a => a.Tags.Contains(tag));
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
     {
-        var tempList = new List<TaskDTO>();
-        foreach (Task t in _context.Tasks.Where(a => a.AssignedTo.Id == userId))
-        {
-            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
-        }
-        return tempList.Count > 0 ? tempList : null;
+        var userName = _context.Users.Where(a => a.Id == userId).Select(a => a.Name).FirstOrDefault();
+        return (IReadOnlyCollection<TaskDTO>)ReadAll()?.Where(a => a.AssignedToName == userName);
+
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
     {
-        var tempList = new List<TaskDTO>();
-        foreach (Task t in _context.Tasks.Where(a => a.State == State.Removed))
-        {
-            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
-        }
-        return tempList.Count > 0 ? tempList : null;
+        return (IReadOnlyCollection<TaskDTO>)ReadAll()?.Where(a => a.State == State.Removed);
+
     }
 
     public Response Update(TaskUpdateDTO task)

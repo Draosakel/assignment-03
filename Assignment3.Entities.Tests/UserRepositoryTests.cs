@@ -18,13 +18,16 @@ public sealed class UserRepositoryTests : IDisposable
         builder.UseSqlite(connection);
         var context = new KanbanContext(builder.Options);
         context.Database.EnsureCreated();
-        //context.Tasks.AddRange();
-        //context.Tags.Add();
+        context.Users.Add(new User{ Email = "something@", Name = "Bob", Id = 1 });
+        context.Users.Add(new User{ Email = "anotherthing@", Name = "Frederick", Id = 2 });
         context.SaveChanges();
 
         _context = context;
         _repository = new UserRepository(_context);
     }
+
+    [Fact]
+    public void 
 
     public void Dispose() {
         _context.Dispose();
