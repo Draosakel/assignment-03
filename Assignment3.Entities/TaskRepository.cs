@@ -66,12 +66,12 @@ public class TaskRepository : ITaskRepository
 
     public IReadOnlyCollection<TaskDTO> ReadAllByState(State state)
     {
-        return (IReadOnlyCollection<TaskDTO>)ReadAll()?.Where(a => a.State == state);
+        return ReadAll()?.Where(a => a.State == state).ToList();
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag)
     {
-        return (IReadOnlyCollection<TaskDTO>)ReadAll()?.Where(a => a.Tags.Contains(tag));
+        return ReadAll()?.Where(a => a.Tags.Contains(tag)).ToList();
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
