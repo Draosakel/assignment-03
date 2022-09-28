@@ -12,6 +12,6 @@ public class User
 
     [Required, StringLength(100)]
     public string Email { get; set; }
-    [NotMapped]
+
     public List<Task> Tasks { get; set; }
 }

@@ -8,6 +8,5 @@ public class Tag
 
     [Required, StringLength(50)]
     public string Name{ get; set; }
-    [NotMapped]
     public virtual ICollection<Task> Tasks { get; set; }
 }
