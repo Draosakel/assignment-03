@@ -77,7 +77,7 @@ public class TaskRepository : ITaskRepository
     public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
     {
         var userName = _context.Users.Where(a => a.Id == userId).Select(a => a.Name).FirstOrDefault();
-        return (IReadOnlyCollection<TaskDTO>)ReadAll()?.Where(a => a.AssignedToName == userName);
+        return ReadAll()?.Where(a => a.AssignedToName == userName).ToList();
 
     }
 
