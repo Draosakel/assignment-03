@@ -18,7 +18,7 @@ public sealed class TaskRepositoryTests : IDisposable
         builder.UseSqlite(connection);
         var context = new KanbanContext(builder.Options);
         context.Database.EnsureCreated();
-        context.Tasks.AddRange(new Task{Title = "Task1", Id = 1 }, new Task{Title = "Task2", Id = 2 });
+        context.Tasks.AddRange(new Task{Title = "Task1", Id = 1, State = State.New }, new Task{Title = "Task2", Id = 2, State = State.New });
         context.Tags.Add(new Tag{Name = "Tag1", Id = 1});
         context.SaveChanges();
 

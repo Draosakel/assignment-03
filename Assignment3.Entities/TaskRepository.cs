@@ -6,7 +6,7 @@ namespace Assignment3.Entities;
 public class TaskRepository : ITaskRepository
 {
     private readonly List<Task> _task = new List<Task>();
-    public IReadOnlyCollection<Task> Tasks => _task;
+    //public IReadOnlyCollection<Task> Tasks => _task;
     KanbanContext _context;
     public TaskRepository(KanbanContext _context){
         this._context = _context;
@@ -22,7 +22,7 @@ public class TaskRepository : ITaskRepository
 
     public Response Delete(int taskId)
     {
-        var t = Tasks.FirstOrDefault(a => a.Id == taskId);
+        var t = _context.Tasks.Where(a => a.Id == taskId).FirstOrDefault();
 
         bool exists = t != null;
 
@@ -47,7 +47,7 @@ public class TaskRepository : ITaskRepository
 
     public TaskDetailsDTO Read(int taskId)
     {
-        var t = Tasks.FirstOrDefault(a => a.Id == taskId);
+        var t = _context.Tasks.FirstOrDefault(a => a.Id == taskId);
 
         if (t == null) return null;
 
@@ -57,7 +57,7 @@ public class TaskRepository : ITaskRepository
     public IReadOnlyCollection<TaskDTO> ReadAll()
     {
         var tempList = new List<TaskDTO>();
-        foreach (Task t in Tasks)
+        foreach (Task t in _context.Tasks)
         {
             tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
         }
@@ -67,7 +67,7 @@ public class TaskRepository : ITaskRepository
     public IReadOnlyCollection<TaskDTO> ReadAllByState(State state)
     {
         var tempList = new List<TaskDTO>();
-        foreach (Task t in Tasks.Where(a => a.State == state))
+        foreach (Task t in _context.Tasks.Where(a => a.State == state))
         {
             tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
         }
@@ -77,7 +77,7 @@ public class TaskRepository : ITaskRepository
     public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag)
     {
         var tempList = new List<TaskDTO>();
-        foreach (Task t in Tasks.Where(a => ((IReadOnlyCollection<string>)a.Tags).Contains(tag)))
+        foreach (Task t in _context.Tasks.Where(a => ((IReadOnlyCollection<string>)a.Tags).Contains(tag)))
         {
             tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
         }
@@ -87,7 +87,7 @@ public class TaskRepository : ITaskRepository
     public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
     {
         var tempList = new List<TaskDTO>();
-        foreach (Task t in Tasks.Where(a => a.AssignedTo.Id == userId))
+        foreach (Task t in _context.Tasks.Where(a => a.AssignedTo.Id == userId))
         {
             tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
         }
@@ -97,7 +97,7 @@ public class TaskRepository : ITaskRepository
     public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
     {
         var tempList = new List<TaskDTO>();
-        foreach (Task t in Tasks.Where(a => a.State == State.Removed))
+        foreach (Task t in _context.Tasks.Where(a => a.State == State.Removed))
         {
             tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
         }
@@ -106,7 +106,7 @@ public class TaskRepository : ITaskRepository
 
     public Response Update(TaskUpdateDTO task)
     {
-        var t = Tasks.FirstOrDefault(a => a.Id == task.Id);
+        var t = _context.Tasks.FirstOrDefault(a => a.Id == task.Id);
 
         bool exists = t != null;
         if (!exists) return Response.NotFound;

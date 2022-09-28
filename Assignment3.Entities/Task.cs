@@ -19,6 +19,7 @@ public class Task
 
     [Required]
     public State State { get; set; }
+    [NotMapped]
     public virtual ICollection<string>? Tags { get; set; }
 
 }
