@@ -23,10 +23,11 @@ public sealed class TaskRepositoryTests : IDisposable
         context.Database.EnsureCreated();
         var task1 = new Task { Title = "Task1", Id = 1, State = State.New, AssignedToId = 1 };
         var task2 = new Task { Title = "Task2", Id = 2, State = State.New, AssignedToId = 1 };
+        var task4 = new Task { Title = "Task4", Id = 4, State = State.Removed };
         var tag1 = new Tag { Name = "Tag1", Id = 1 };
         context.Tags.Add(tag1);
         var tagTask = new Task { Title = "TagTask", Id = 9, State = State.New, Tags = new[] { new Tag { Name = "TagTag" } } };
-        context.Tasks.AddRange(task1, task2, tagTask);
+        context.Tasks.AddRange(task1, task2, tagTask, task4);
         var user = new User { Email = "", Name = "UserName", Id = 1 };
         context.Users.Add(user);
         context.SaveChanges();
@@ -40,7 +41,7 @@ public sealed class TaskRepositoryTests : IDisposable
     {
         var (response, created) = _repository.Create(new TaskCreateDTO(Title: "TaskTitle", AssignedToId: 3, Description: "TagTest", Tags: new List<string>()));
         response.Should().Be(Response.Created);
-        created.Should().Be(4);
+        created.Should().Be(3);
     }
 
     [Fact]
@@ -63,7 +64,8 @@ public sealed class TaskRepositoryTests : IDisposable
         var response = _repository.ReadAll();
         response.Should().BeEquivalentTo(new List<TaskDTO>() { new TaskDTO(1, "Task1", "UserName", null, State.New),
             new TaskDTO(2, "Task2", "UserName", null, State.New),
-            new TaskDTO(9, "TagTask", null, new []{ "TagTag" }, State.New) });
+            new TaskDTO(9, "TagTask", null, new []{ "TagTag" }, State.New),
+            new TaskDTO(4, "Task4", null, null, State.Removed)});
     }
 
     [Fact]
@@ -96,7 +98,7 @@ public sealed class TaskRepositoryTests : IDisposable
     public void ReadAllRemoved_Returns_IReadOnlyCollection_State_Removed()
     {
         var response = _repository.ReadAllRemoved();
-        response.Should().BeEquivalentTo(new List<TaskDTO>(){ new TaskDTO(3, "Task3", null, null, State.Removed)});
+        response.Should().BeEquivalentTo(new List<TaskDTO>() { new TaskDTO(4, "Task4", null, null, State.Removed) });
     }
 
     [Fact]
@@ -107,7 +109,7 @@ public sealed class TaskRepositoryTests : IDisposable
         response.Should().Be(Response.Updated);
     }
 
-     [Fact]
+    [Fact]
     public void Update_given_NOT_Existing_TaskUpdateDTO_Returns_State_Updated()
     {
         var updateTaskDTO = new TaskUpdateDTO(5, "UpdatedTask2", null, null, new List<string>(), State.Active);
@@ -115,7 +117,8 @@ public sealed class TaskRepositoryTests : IDisposable
         response.Should().Be(Response.NotFound);
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         _context.Dispose();
     }
 }
