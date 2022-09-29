@@ -60,7 +60,8 @@ public class TaskRepository : ITaskRepository
         var tempList = new List<TaskDTO>();
         foreach (Task t in _context.Tasks)
         {
-            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo?.Name, t.Tags.Select(a => a.Name).ToList(), t.State));
+            var tags = t.Tags?.Select(a => a.Name).ToList();
+            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo?.Name, tags, t.State));
         }
         return tempList.Count > 0 ? tempList : null;
     }
@@ -72,7 +73,7 @@ public class TaskRepository : ITaskRepository
 
     public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag)
     {
-        return ReadAll()?.Where(a => a.Tags.Contains(tag)).ToList();
+        return ReadAll()?.Where(a => a.Tags != null && a.Tags.Contains(tag)).ToList();
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)

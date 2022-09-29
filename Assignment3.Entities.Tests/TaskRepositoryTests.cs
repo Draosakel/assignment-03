@@ -25,7 +25,7 @@ public sealed class TaskRepositoryTests : IDisposable
         var task2 = new Task { Title = "Task2", Id = 2, State = State.New, AssignedToId = 1 };
         var tag1 = new Tag { Name = "Tag1", Id = 1 };
         context.Tags.Add(tag1);
-        var tagTask = new Task { Title = "TagTask", Id = 9, State = State.New };
+        var tagTask = new Task { Title = "TagTask", Id = 9, State = State.New, Tags = new[] { new Tag { Name = "TagTag" } } };
         context.Tasks.AddRange(task1, task2, tagTask);
         var user = new User { Email = "", Name = "UserName", Id = 1 };
         context.Users.Add(user);
@@ -63,7 +63,7 @@ public sealed class TaskRepositoryTests : IDisposable
         var response = _repository.ReadAll();
         response.Should().BeEquivalentTo(new List<TaskDTO>() { new TaskDTO(1, "Task1", "UserName", null, State.New),
             new TaskDTO(2, "Task2", "UserName", null, State.New),
-            new TaskDTO(9, "TagTask", null, null, State.New) });
+            new TaskDTO(9, "TagTask", null, new []{ "TagTag" }, State.New) });
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public sealed class TaskRepositoryTests : IDisposable
         var response = _repository.ReadAllByState(State.New);
         response.Should().BeEquivalentTo(new List<TaskDTO>() { new TaskDTO(1, "Task1", "UserName", null, State.New),
             new TaskDTO(2, "Task2", "UserName", null, State.New),
-            new TaskDTO(9, "TagTask", null, null, State.New) });
+            new TaskDTO(9, "TagTask", null, new []{ "TagTag" }, State.New) });
     }
 
     [Fact]
@@ -85,10 +85,10 @@ public sealed class TaskRepositoryTests : IDisposable
     [Fact]
     public void ReadAllByTag()
     {
-        var dto = new TaskUpdateDTO(9, "TagTask", null, null, new[] { "TagTag" }, State.New);
-        _repository.Update(dto);
+        //var dto = new TaskUpdateDTO(9, "TagTask", null, null, new[] { "TagTag" }, State.New);
+        //_repository.Update(dto);
 
-        var response = _repository.ReadAllByTag("Tag1");
+        var response = _repository.ReadAllByTag("TagTag");
         response.Should().BeEquivalentTo(new[] { new TaskDTO(9, "TagTask", null, new[] { "TagTag" }, State.New) });
     }
 
