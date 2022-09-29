@@ -13,7 +13,8 @@ public class TaskRepository : ITaskRepository
 
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {
-        var t = new Task() { Title = task.Title, Id = task.AssignedToId, Description = task.Description, Tags = (ICollection<string>)task.Tags, State = State.New };
+        var tags = task.Tags != null ? _context.Tags.ToList().Where(tag => task.Tags.Contains(tag.Name)).ToList() : null;
+        var t = new Task() { Title = task.Title, Id = task.AssignedToId, Description = task.Description, Tags = tags, State = State.New };
         _context.Tasks.Add(t);
         return (Response.Created, (int)t.Id);
     }
@@ -59,7 +60,7 @@ public class TaskRepository : ITaskRepository
         var tempList = new List<TaskDTO>();
         foreach (Task t in _context.Tasks)
         {
-            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo?.Name, (IReadOnlyCollection<string>)t.Tags, t.State));
+            tempList.Add(new TaskDTO((int)t.Id, t.Title, t.AssignedTo?.Name, t.Tags.Select(a => a.Name).ToList(), t.State));
         }
         return tempList.Count > 0 ? tempList : null;
     }
@@ -83,7 +84,7 @@ public class TaskRepository : ITaskRepository
 
     public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
     {
-        return (IReadOnlyCollection<TaskDTO>)ReadAll()?.Where(a => a.State == State.Removed);
+        return ReadAll()?.Where(a => a.State == State.Removed).ToList();
 
     }
 
@@ -96,7 +97,8 @@ public class TaskRepository : ITaskRepository
 
         t.Title = task.Title;
         t.Description = task.Description;
-        t.Tags = (ICollection<string>)task.Tags;
+        var tags = task.Tags != null ? _context.Tags.ToList().Where(tag => task.Tags.Contains(tag.Name)).ToList() : null;
+        t.Tags = tags;
         t.AssignedToId = task.AssignedToId;
         t.State = task.State;
 

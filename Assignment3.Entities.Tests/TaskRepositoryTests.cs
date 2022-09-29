@@ -18,11 +18,15 @@ public sealed class TaskRepositoryTests : IDisposable
         var builder = new DbContextOptionsBuilder<KanbanContext>();
         builder.UseSqlite(connection);
         var context = new KanbanContext(builder.Options);
+        //context.Tasks.Include(t => t.Tags).ToList();
+        //context.Tags.Include(t => t.Tasks).ToList();
         context.Database.EnsureCreated();
         var task1 = new Task { Title = "Task1", Id = 1, State = State.New, AssignedToId = 1 };
         var task2 = new Task { Title = "Task2", Id = 2, State = State.New, AssignedToId = 1 };
-        context.Tasks.AddRange(task1, task2);
-        context.Tags.Add(new Tag { Name = "Tag1", Id = 1 });
+        var tag1 = new Tag { Name = "Tag1", Id = 1 };
+        context.Tags.Add(tag1);
+        var tagTask = new Task { Title = "TagTask", Id = 9, State = State.New };
+        context.Tasks.AddRange(task1, task2, tagTask);
         var user = new User { Email = "", Name = "UserName", Id = 1 };
         context.Users.Add(user);
         context.SaveChanges();
@@ -57,14 +61,18 @@ public sealed class TaskRepositoryTests : IDisposable
     public void ReadAll_Returns_IReadOnlyCollection()
     {
         var response = _repository.ReadAll();
-        response.Should().BeEquivalentTo(new List<TaskDTO>() { new TaskDTO(1, "Task1", "UserName", null, State.New), new TaskDTO(2, "Task2", "UserName", null, State.New) });
+        response.Should().BeEquivalentTo(new List<TaskDTO>() { new TaskDTO(1, "Task1", "UserName", null, State.New),
+            new TaskDTO(2, "Task2", "UserName", null, State.New),
+            new TaskDTO(9, "TagTask", null, null, State.New) });
     }
 
     [Fact]
     public void ReadAllByState_given_State_New_Returns_IReadOnlyCollection()
     {
         var response = _repository.ReadAllByState(State.New);
-        response.Should().BeEquivalentTo(new List<TaskDTO>() { new TaskDTO(1, "Task1", "UserName", null, State.New), new TaskDTO(2, "Task2", "UserName", null, State.New) });
+        response.Should().BeEquivalentTo(new List<TaskDTO>() { new TaskDTO(1, "Task1", "UserName", null, State.New),
+            new TaskDTO(2, "Task2", "UserName", null, State.New),
+            new TaskDTO(9, "TagTask", null, null, State.New) });
     }
 
     [Fact]
@@ -72,6 +80,16 @@ public sealed class TaskRepositoryTests : IDisposable
     {
         var response = _repository.ReadAllByUser(1);
         response.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void ReadAllByTag()
+    {
+        var dto = new TaskUpdateDTO(9, "TagTask", null, null, new[] { "TagTag" }, State.New);
+        _repository.Update(dto);
+
+        var response = _repository.ReadAllByTag("Tag1");
+        response.Should().BeEquivalentTo(new[] { new TaskDTO(9, "TagTask", null, new[] { "TagTag" }, State.New) });
     }
 
     public void Dispose()

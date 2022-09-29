@@ -20,7 +20,5 @@ public class KanbanContext : DbContext
         modelBuilder.Entity<Task>(entity => entity.Property(e => e.State).HasConversion(new EnumToStringConverter<State>()));
         modelBuilder.Entity<User>(entity => entity.HasIndex(e => e.Email).IsUnique());
         modelBuilder.Entity<Tag>(entity => entity.HasIndex(e => e.Name).IsUnique());
-
-
     }
 }
