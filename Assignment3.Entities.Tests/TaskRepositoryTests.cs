@@ -40,7 +40,7 @@ public sealed class TaskRepositoryTests : IDisposable
     {
         var (response, created) = _repository.Create(new TaskCreateDTO(Title: "TaskTitle", AssignedToId: 3, Description: "TagTest", Tags: new List<string>()));
         response.Should().Be(Response.Created);
-        created.Should().Be(3);
+        created.Should().Be(4);
     }
 
     [Fact]
@@ -92,8 +92,30 @@ public sealed class TaskRepositoryTests : IDisposable
         response.Should().BeEquivalentTo(new[] { new TaskDTO(9, "TagTask", null, new[] { "TagTag" }, State.New) });
     }
 
-    public void Dispose()
+    [Fact]
+    public void ReadAllRemoved_Returns_IReadOnlyCollection_State_Removed()
     {
+        var response = _repository.ReadAllRemoved();
+        response.Should().BeEquivalentTo(new List<TaskDTO>(){ new TaskDTO(3, "Task3", null, null, State.Removed)});
+    }
+
+    [Fact]
+    public void Update_given_TaskUpdateDTO_Returns_State_Updated()
+    {
+        var updateTaskDTO = new TaskUpdateDTO(2, "UpdatedTask2", null, null, new List<string>(), State.Active);
+        var response = _repository.Update(updateTaskDTO);
+        response.Should().Be(Response.Updated);
+    }
+
+     [Fact]
+    public void Update_given_NOT_Existing_TaskUpdateDTO_Returns_State_Updated()
+    {
+        var updateTaskDTO = new TaskUpdateDTO(5, "UpdatedTask2", null, null, new List<string>(), State.Active);
+        var response = _repository.Update(updateTaskDTO);
+        response.Should().Be(Response.NotFound);
+    }
+
+    public void Dispose() {
         _context.Dispose();
     }
 }

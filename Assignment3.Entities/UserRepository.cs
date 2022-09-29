@@ -31,10 +31,10 @@ public class UserRepository : IUserRepository
 
     public Response Delete(int userId, bool force = false)
     {
-        var u = _context.Users.FirstOrDefault(a => a.Id == userId);
+        var u = _context.Users.Find(userId);
         bool exists = u != null;
         bool canBeDeleted = true;
-        if (u.Tasks.Count > 0 && force == false) canBeDeleted = false;
+        if (u?.Tasks != null && force == false) canBeDeleted = false;
         if (exists)
         {
             if (canBeDeleted) _context.Users.Remove(_context.Users.Where(a => a.Id == userId).First());
